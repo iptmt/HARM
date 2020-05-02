@@ -85,9 +85,11 @@ if __name__ == "__main__":
     import random, json
     from data_util import TrainLoader
 
-    harm = HARM_Model(10000)
     with open("dump/vocab.json", 'r') as f:
         vocab = json.load(f)
+    glove_emb = torch.load("dump/glove.emb")
+
+    harm = HARM_Model(10000, glove_emb)
     ld = TrainLoader("data/train.csv", vocab, "cpu")
 
     for q, docs in ld():
