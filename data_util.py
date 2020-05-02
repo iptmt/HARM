@@ -68,7 +68,7 @@ def load_glove(glove_path, dump_path, word_dict):
         return torch.tensor([float(t) for t in tokens], dtype=torch.float)
     raw_emb = torch.empty((len(word_dict), d_emb), dtype=torch.float).uniform_(-0.1, 0.1) 
     words = set(word_dict.keys())
-    regex = re.compile(r"(\w+)\s")
+    regex = re.compile(r"(\S+)")
     with open(glove_path, 'r') as f:
         for line in f:
             obj = regex.match(line)
