@@ -68,7 +68,7 @@ def load_glove(glove_path, dump_path, word_dict):
         return torch.tensor([float(t) for t in tokens], dtype=torch.float)
     raw_emb = torch.empty((len(word_dict), d_emb), dtype=torch.float).uniform_(-0.1, 0.1) 
     words = set(word_dict.keys())
-    regex = re.compile(r"\B(\w+)\s")
+    regex = re.compile(r"\A(\w+)\s")
     with open(glove_path, 'r') as f:
         for line in f:
             pattens = regex.findall(line)
@@ -174,4 +174,4 @@ class TestLoader:
 
 if __name__ == "__main__":
     word_dict = gen_vocab("data/train.csv", "dump/vocab.json", min_freq=1)
-    load_glove("data/glove.840B.300d.txt", "dump/glove.emb", word_dict)
+    load_glove("data/glove.6B.300d.txt", "dump/glove.emb", word_dict)
