@@ -14,8 +14,8 @@ model_dump_file = "dump/model.pth"
 results_file = "output/results.json"
 
 train_file = "data/train.csv"
-dev_file = "data/train.csv"
-test_file = "data/train.csv"
+dev_file = "data/dev.csv"
+test_file = "data/test.csv"
 
 
 mode = sys.argv[1]
