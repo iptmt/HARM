@@ -5,7 +5,7 @@ from model import HARM_Model
 
 
 # Hyper-parameters
-total_epochs = 10
+total_epochs = 20
 lr = 2.0
 device = "CUDA:0"
 vocab_file = "dump/vocab.json"
