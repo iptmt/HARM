@@ -87,9 +87,9 @@ if __name__ == "__main__":
 
     with open("dump/vocab.json", 'r') as f:
         vocab = json.load(f)
-    glove_emb = torch.load("dump/glove.emb")
+    # glove_emb = torch.load("dump/glove.emb")
 
-    harm = HARM_Model(10000, glove_emb)
+    harm = HARM_Model(10000, None)
     ld = TrainLoader("data/train.csv", vocab, "cpu")
 
     for q, docs in ld():

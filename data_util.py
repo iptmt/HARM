@@ -21,8 +21,8 @@ def load_docs(file_path):
         for idx, line in enumerate(f):
             if idx == 0:
                 continue
-            qid, query, _, doc, label = line.strip().split("\t")
-            docs.append((int(qid), query, doc, int(label)))
+            qid, query, doc_id, doc, label = line.strip().split("\t")
+            docs.append((int(qid), query, int(doc_id), doc, int(label)))
     return docs
 
 def tokenize_query(query):
@@ -46,7 +46,7 @@ def tokenize_doc(doc):
 # 生成word->id的映射词典
 def gen_vocab(file_path, dump_path, min_freq=1):
     long_word_list, qid_set = list(), set()
-    for qid, query, doc, _ in load_docs(file_path):
+    for qid, query, _, doc, _ in load_docs(file_path):
         if qid not in qid_set:
             long_word_list += tokenize_query(query)
             qid_set.add(qid)
@@ -106,7 +106,7 @@ class TrainLoader:
         self.vocab = vocab
         self.device = torch.device(device)
 
-        for qid, query, doc, label in docs:
+        for qid, query, _, doc, label in docs:
             query = self.tokens_to_ids(tokenize_query(query))
             doc = [self.tokens_to_ids(sent) for sent in tokenize_doc(doc)]
             if qid not in self.data:
@@ -144,32 +144,34 @@ class TestLoader:
         self.vocab = vocab
         self.device = torch.device(device)
         
-        for qid, query, doc, label in docs:
+        for qid, query, doc_id, doc, label in docs:
             query = self.tokens_to_ids(tokenize_query(query))
             doc = [self.tokens_to_ids(sent) for sent in tokenize_doc(doc)]
             if qid not in self.data:
                 self.data[qid] = {"q": query, "d": []}
-            self.data[qid]["d"].append((doc, label))
+            self.data[qid]["d"].append((doc_id, doc, label))
 
     def tokens_to_ids(self, tokens):
         return [self.vocab[token] if token in self.vocab else unk_id for token in tokens]
     
-    def pack(self, query, docs, labels):
+    def pack(self, query, docs, labels, qid, doc_ids):
         query = [query] * len(docs)
         docs = complement_doc(docs)
         segments = [complement_sent(seg) for seg in list(zip(*docs))]
         return (
             torch.tensor(query).long().to(self.device),
             [torch.tensor(seg).long().to(self.device) for seg in segments],
-            torch.tensor(labels).long().to(self.device)
+            torch.tensor(labels).long().to(self.device),
+            qid,
+            list(doc_ids)
         )
     
     def __call__(self):
         for qid in self.data:
             obj = self.data[qid]
             query = obj["q"]
-            docs, labels = zip(*obj["d"])
-            yield self.pack(query, docs, labels)
+            doc_ids, docs, labels = zip(*obj["d"])
+            yield self.pack(query, docs, labels, qid, doc_ids)
 
 
 if __name__ == "__main__":
