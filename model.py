@@ -3,24 +3,25 @@ import torch.nn as nn
 
 import torch.nn.functional as F
 
-d_model = 300
+d_emb = 300
 d_hidden = 150
+d_model = 300 # 2 * d_hidden
 p_drop = 0.2
 
 class HARM_Model(nn.Module):
     def __init__(self, n_vocab, glove_emb=None):
         super().__init__()
         if glove_emb is None:
-            self.embedding = nn.Embedding(n_vocab, d_model, padding_idx=0)
+            self.embedding = nn.Embedding(n_vocab, d_emb, padding_idx=0)
         else:
             self.embedding = nn.Embedding.from_pretrained(glove_emb, freeze=False, padding_idx=0)
         # encoders
         self.enc_q = nn.GRU(
-            input_size=d_model, hidden_size=d_hidden, num_layers=1,
+            input_size=d_emb, hidden_size=d_hidden, num_layers=1,
             batch_first=True, bidirectional=True
         )
         self.enc_d = nn.GRU(
-            input_size=d_model, hidden_size=d_hidden, num_layers=1,
+            input_size=d_emb, hidden_size=d_hidden, num_layers=1,
             batch_first=True, bidirectional=True
         )
         # weights for cross attention
