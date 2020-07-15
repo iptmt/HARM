@@ -69,6 +69,7 @@ if mode == "train":
 if mode == "test":
     ds_test = TestLoader(test_file, vocab, device)
     model.load_state_dict(torch.load(model_dump_file))
+    model.eval()
 
     ds_test = TestLoader(test_file, vocab, device)
 
